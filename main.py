@@ -11,6 +11,7 @@ from torch.optim.lr_scheduler import StepLR
 import os
 import logging
 import time
+import subprocess
 
 logging.basicConfig(
     format="%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s",
@@ -173,6 +174,11 @@ def main():
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
+
+    # prepare folder
+    cmd = "mkdir -p " + args.ckpt_dir
+    # python 2.7 & 3
+    ret = subprocess.check_output(cmd, shell=True)
 
     last_epoch = 0
     last_ckpt = get_last_ckpt(args.ckpt_dir)
