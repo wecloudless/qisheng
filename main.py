@@ -11,7 +11,6 @@ from torch.optim.lr_scheduler import StepLR
 import os
 import logging
 import time
-import subprocess
 
 logging.basicConfig(
     format="%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s",
@@ -130,6 +129,7 @@ def main():
         "--profiling", action="store_true", default=False, help="profile one batch"
     )
     parser.add_argument("--ckpt-dir", type=str, default="./ckpts", help="checkpoint directory")
+    parser.add_argument("--data-dir", type=str, default="./data", help="data directory")
     args = parser.parse_args()
     use_cuda = args.gpu and torch.cuda.is_available()
 
@@ -149,13 +149,19 @@ def main():
         ]
     )
 
+    # cmd = "mkdir -p " + args.ckpt_dir
+    # # python 2.7 & 3
+    # ret = subprocess.check_output(cmd, shell=True)
+    os.makedirs(args.ckpt_dir, exist_ok=True)
+    os.makedirs(args.data_dir, exist_ok=True)
+
     # CIFAR-10 数据集下载
     train_dataset = torchvision.datasets.CIFAR10(
-        root="../data/", train=True, transform=transform, download=True
+        root=args.data_dir, train=True, transform=transform, download=True
     )
 
     test_dataset = torchvision.datasets.CIFAR10(
-        root="../data/", train=False, transform=transforms.ToTensor()
+        root=args.data_dir, train=False, transform=transforms.ToTensor()
     )
 
     # 数据载入
@@ -174,11 +180,6 @@ def main():
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-
-    # prepare folder
-    cmd = "mkdir -p " + args.ckpt_dir
-    # python 2.7 & 3
-    ret = subprocess.check_output(cmd, shell=True)
 
     last_epoch = 0
     last_ckpt = get_last_ckpt(args.ckpt_dir)
