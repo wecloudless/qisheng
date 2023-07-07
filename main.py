@@ -103,7 +103,7 @@ def main():
     parser = argparse.ArgumentParser(description="PyTorch Resnet Example")
     parser.add_argument("-b", type=int, default=64, help="batch size for dataloader")
     parser.add_argument("-tb", type=int, default=256, help="batch size for dataloader")
-    parser.add_argument("--epoch", type=int, default=100, help="num of epochs to train")
+    parser.add_argument("--epoch", type=int, default=50, help="num of epochs to train")
     parser.add_argument(
         "--lr", type=float, default=1.0, metavar="LR", help="learning rate (default: 1.0)"
     )
@@ -156,21 +156,21 @@ def main():
     os.makedirs(args.data_dir, exist_ok=True)
 
     # CIFAR-10 数据集下载
-    train_dataset = torchvision.datasets.CIFAR10(
+    train_dataset = datasets.CIFAR10(
         root=args.data_dir, train=True, transform=transform, download=True
     )
 
-    test_dataset = torchvision.datasets.CIFAR10(
+    test_dataset = datasets.CIFAR10(
         root=args.data_dir, train=False, transform=transforms.ToTensor()
     )
 
     # 数据载入
     train_loader = torch.utils.data.DataLoader(
-        dataset=train_dataset, batch_size=args.batch_size, shuffle=True
+        dataset=train_dataset, batch_size=args.b, shuffle=True
     )
 
     test_loader = torch.utils.data.DataLoader(
-        dataset=test_dataset, batch_size=args.test_batch_size, shuffle=False
+        dataset=test_dataset, batch_size=args.tb, shuffle=False
     )
 
     model = models.resnet50()
