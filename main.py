@@ -103,7 +103,7 @@ def main():
     parser = argparse.ArgumentParser(description="PyTorch Resnet Example")
     parser.add_argument("-b", type=int, default=64, help="batch size for dataloader")
     parser.add_argument("-tb", type=int, default=256, help="batch size for dataloader")
-    parser.add_argument("--epoch", type=int, default=50, help="num of epochs to train")
+    parser.add_argument("--epoch", type=int, default=10, help="num of epochs to train")
     parser.add_argument(
         "--lr", type=float, default=1.0, metavar="LR", help="learning rate (default: 1.0)"
     )

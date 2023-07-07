@@ -7,12 +7,12 @@ setup: |
   pip3 install -r requirements.txt
 
 run: |
-  python
+  python3
   main.py
   --gpu
 
 profile: |
-  python 
+  python3 
   main.py 
   --gpu 
   --profiling
