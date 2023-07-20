@@ -6,19 +6,22 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms, models
 from torch.optim.lr_scheduler import StepLR
+import time
+t0 = time.time()
 
 # import wecloud_callback
 import os
 import logging
-import time
 
 logging.basicConfig(
     format="%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s",
     level=logging.INFO,
 )
+accumulated_training_time = 0
 
 
 def train(args, model, device, train_loader, optimizer, epoch):
+    global accumulated_training_time
     model.train()
     epoch_start_time = time.time()
     for batch_idx, (data, target) in enumerate(train_loader):
@@ -55,6 +58,9 @@ def train(args, model, device, train_loader, optimizer, epoch):
                 time.time() - epoch_start_time,  # current epoch wall-clock time
             )
         )
+        end = time.time()
+        accumulated_training_time += end - batch_start_time
+        print("[profiling] step time: {}s, accumuated training time: {}s".format(end - batch_start_time, accumulated_training_time))
         if args.profiling:
             logging.info(
                 f"PROFILING: dataset total number {len(train_loader.dataset)}, training one batch costs {time.time() - batch_start_time} seconds"
@@ -99,6 +105,7 @@ def get_last_ckpt_epoch(ckpt_path):
 
 
 def main():
+    global accumulated_training_time, t0
     # Training settings
     parser = argparse.ArgumentParser(description="PyTorch Resnet Example")
     parser.add_argument("-b", type=int, default=64, help="batch size for dataloader")
@@ -189,6 +196,8 @@ def main():
         print("load ckpt from %s" % last_ckpt)
 
     # wecloud_callback.init(total_steps=args.epoch * iter_per_epoch)
+    t1 = time.time()
+    print("[profiling] init time: {}s".format(t1-t0))
     for epoch in range(1, args.epoch + 1):
         scheduler.step()
         if epoch <= last_epoch:
