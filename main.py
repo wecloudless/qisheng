@@ -207,7 +207,7 @@ def main():
         if args.profiling:
             break
         test(model, device, test_loader)
-        os.mkdirs(os.path.join(args.ckpt_dir, str(epoch)))
+        os.makedirs(os.path.join(args.ckpt_dir, str(epoch)))
         torch.save(model.state_dict(), os.path.join(args.ckpt_dir, str(epoch),"checkpoint.pth"))
 
 
