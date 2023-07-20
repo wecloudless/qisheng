@@ -101,7 +101,8 @@ def get_last_ckpt(ckpt_dir):
 
 
 def get_last_ckpt_epoch(ckpt_path):
-    return int(ckpt_path.split(".")[0].split("_")[-1])
+    # return int(ckpt_path.split(".")[0].split("_")[-1])
+    return int(ckpt_path)
 
 
 def main():
@@ -135,7 +136,7 @@ def main():
     parser.add_argument(
         "--profiling", action="store_true", default=False, help="profile one batch"
     )
-    parser.add_argument("--ckpt-dir", type=str, default="./ckpts", help="checkpoint directory")
+    parser.add_argument("--ckpt-dir", type=str, default="output/checkpoint", help="checkpoint directory")
     parser.add_argument("--data-dir", type=str, default="./data", help="data directory")
     args = parser.parse_args()
     use_cuda = args.gpu and torch.cuda.is_available()
@@ -192,7 +193,7 @@ def main():
     last_ckpt = get_last_ckpt(args.ckpt_dir)
     if last_ckpt is not None:
         last_epoch = get_last_ckpt_epoch(last_ckpt)
-        model.load_state_dict(torch.load(os.path.join(args.ckpt_dir, last_ckpt)))
+        model.load_state_dict(torch.load(os.path.join(args.ckpt_dir, last_ckpt, "checkpoint.pth")))
         print("load ckpt from %s" % last_ckpt)
 
     # wecloud_callback.init(total_steps=args.epoch * iter_per_epoch)
@@ -206,7 +207,8 @@ def main():
         if args.profiling:
             break
         test(model, device, test_loader)
-        torch.save(model.state_dict(), os.path.join(args.ckpt_dir, f"ckpt_{epoch}.pth"))
+        os.mkdirs(os.path.join(args.ckpt_dir, str(epoch)))
+        torch.save(model.state_dict(), os.path.join(args.ckpt_dir, str(epoch),"checkpoint.pth"))
 
 
 if __name__ == "__main__":
